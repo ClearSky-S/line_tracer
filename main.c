@@ -194,8 +194,10 @@ void systick_wait1s()
         systick_wait1ms();
     }
 }
-
-
+void (*TimerA2Task)(void);
+void TimerA2_Init(void(*task)(void), uint16_t period);
+void TA2_0_IRQHandler(void);
+void task();
 void main(void)
 {
 //	WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;		// stop watchdog timer
@@ -207,9 +209,8 @@ void main(void)
     systick_init();
     ir_init();
     moter_init();
+    TimerA2_Init(&task, 50000);
     int i;
-    int left;
-    int right;
     int left_senser;
     int right_senser;
     while(1){
@@ -233,9 +234,28 @@ void main(void)
             left_forward();
             move(1000,1000);
         } else{
+            right_forward();
+            left_forward();
             move(1000,1000);
         }
-
     }
 
+}
+
+void TimerA2_Init(void(*task)(void), uint16_t period){
+    TimerA2Task = task;
+    TIMER_A2->CTL = 0x0280;
+    TIMER_A2->CCTL[0] = 0x0010;
+    TIMER_A2->CCR[0] = (period-1);
+    TIMER_A2->EX0 = 0x0005;
+    NVIC->IP[3] = (NVIC->IP[3]&0xFFFFFF00)|0x00000040;
+    NVIC->ISER[0] = 0x00001000;
+    TIMER_A2->CTL |= 0x0014;
+}
+void TA2_0_IRQHandler(void){
+    TIMER_A2->CCTL[0] &= ~0x0001;
+    (*TimerA2Task)();
+}
+void task(){
+    printf("interrupt\n");
 }
