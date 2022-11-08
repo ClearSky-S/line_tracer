@@ -210,24 +210,32 @@ void main(void)
     int i;
     int left;
     int right;
+    int left_senser;
+    int right_senser;
     while(1){
-        //ÀÌÁø¼ö
-
         for(i =0;i<50;i++){
             systick_wait1ms();
         }
 
         int sensor = ir_read();
-        left = 0;
-        right = 0;
-        left += (sensor >> 7 & 1)*3 + (sensor >> 6 & 1)*3 + (sensor >> 5 & 1)*2 + (sensor >> 4 & 1)*2;
-        right += (sensor >> 0 & 1)*3 + (sensor >> 1 & 1)*3 + (sensor >> 2 & 1)*2 + (sensor >> 3 & 1)*2;
-
-//        printBinary(sensor);
         printBinary(sensor);
-        left_forward();
-        right_forward();
-        move(right*300,left*300);
+        left_senser = sensor >> 7 & 1;
+        right_senser = sensor >> 0 & 1;
+
+        if(left_senser && right_senser){
+            move(0, 0);
+        } else if(left_senser){
+            left_backward();
+            right_forward();
+            move(1000,1000);
+        } else if(right_senser){
+            right_backward();
+            left_forward();
+            move(1000,1000);
+        } else{
+            move(1000,1000);
+        }
+
     }
 
 }
