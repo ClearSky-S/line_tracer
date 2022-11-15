@@ -10,6 +10,14 @@
  * main.c
  */
 
+uint16_t first_left;
+uint16_t first_right;
+
+uint16_t period_left;
+uint16_t period_right;
+uint32_t left_count, right_count;
+
+
 void led_init()
 {
     P2->SEL0 &= ~0x07;
@@ -198,6 +206,12 @@ void (*TimerA2Task)(void);
 void TimerA2_Init(void(*task)(void), uint16_t period);
 void TA2_0_IRQHandler(void);
 void task();
+void timer_A3_capture_init();
+void TA3_0_IRQHandler(void);
+void TA3_N_IRQHandler(void);
+uint32_t get_left_rpm();
+uint32_t get_right_rpm();
+
 void main(void)
 {
 //	WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;		// stop watchdog timer
@@ -209,10 +223,25 @@ void main(void)
     systick_init();
     ir_init();
     moter_init();
-    TimerA2_Init(&task, 50000);
+    // TimerA2_Init(&task, 50000);
+    timer_A3_capture_init();
     int i;
     int left_senser;
     int right_senser;
+
+    left_backward();
+    right_forward();
+    move(2000,2000);
+    left_count=0;
+    while(1){
+
+        //printf("lc: %d\n", left_count);
+        if(left_count>60){
+
+            move(0,0);
+        }
+    }
+
     while(1){
         for(i =0;i<50;i++){
             systick_wait1ms();
@@ -258,4 +287,39 @@ void TA2_0_IRQHandler(void){
 }
 void task(){
     printf("interrupt\n");
+}
+void timer_A3_capture_init(){
+    P10->SEL0 |= 0x30;
+    P10->SEL1 &= ~0x30;
+    P10->DIR &= ~0x30;
+
+    TIMER_A3->CTL &= ~0x0030;
+    TIMER_A3->CTL = 0x0200;
+
+    TIMER_A3->CCTL[0] = 0x4910;
+    TIMER_A3->CCTL[1] = 0x4910;
+    TIMER_A3->EX0 &= ~0x0007;
+
+    NVIC->IP[3] = (NVIC->IP[3]&0x0000FFFF)|0x40400000;
+    NVIC->ISER[0] = 0x0000C000;
+    TIMER_A3->CTL |= 0x0024;
+
+}
+void TA3_0_IRQHandler(void){
+    TIMER_A3->CCTL[0] &= ~0x0001;
+    period_right = TIMER_A3->CCR[0] - first_right;
+    first_right = TIMER_A3->CCR[0];
+    right_count++;
+}
+void TA3_N_IRQHandler(void){
+    TIMER_A3->CCTL[1] &= ~0x0001;
+    period_left = TIMER_A3->CCR[1] - first_left;
+    first_left = TIMER_A3->CCR[1];
+    left_count++;
+}
+uint32_t get_left_rpm(){
+    return 2000000/period_left;
+}
+uint32_t get_right_rpm(){
+    return 2000000/period_right;
 }
