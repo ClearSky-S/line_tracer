@@ -255,8 +255,11 @@ void moveSimple(int speed, int checkObstacle, int time) // checkObstacle: �¿쿡
         {
             ir_read();
             if (left_sensor3 == 1 || right_sensor3 == 1)
+            {
                 move(0, 0);
-            break;
+                break;
+            }
+
         }
         right_forward();
         left_forward();
