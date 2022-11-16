@@ -22,7 +22,8 @@ uint16_t right_sensor1, right_sensor2, right_sensor3, right_sensor4; // 숫자가 �
 int slow_speed = 1000;
 int default_speed = 3000;
 int fast_speed = 6000;
-int rotate_speed = 2000;
+int rotate_speed = 1500;
+int interval=10;
 
 void led_init()
 {
@@ -188,6 +189,67 @@ void rotate(int degree); // 현재 위치를 기준으로 회전, 시계 방향이 + 방향
 void moveSimple(int speed, int checkObstacle, int time); // checkObstacle: 좌우에 장애물이 있으면 엄춤
 void moveCurve(int speed, int checkObstacle, int time); // checkObstacle: 좌우에 장애물이 있으면 엄춤
 
+void track1(){
+
+    moveCurve(default_speed, 1, 999999);
+    Clock_Delay1ms(300);
+    moveSimple(slow_speed, 0, 300);
+    rotate(90);
+
+    moveCurve(default_speed, 1, 999999);
+    Clock_Delay1ms(300);
+    moveSimple(slow_speed, 0, 300);
+    rotate(90);
+
+    moveCurve(default_speed, 1, 999999);
+    Clock_Delay1ms(300);
+    moveSimple(slow_speed, 0, 300);
+    moveSimple(slow_speed, 0, 10);
+
+    moveCurve(default_speed, 1, 999999);
+    Clock_Delay1ms(300);
+    moveSimple(slow_speed, 0, 300);
+    rotate(90);
+
+    moveCurve(default_speed, 1, 999999);
+    Clock_Delay1ms(300);
+    moveSimple(slow_speed, 0, 300);
+    rotate(-90);
+
+    moveCurve(default_speed, 1, 999999);
+    Clock_Delay1ms(300);
+    moveSimple(slow_speed, 0, 300);
+    rotate(90);
+
+    moveCurve(default_speed, 1, 999999);
+    Clock_Delay1ms(300);
+    moveSimple(slow_speed, 0, 300);
+    rotate(-90);
+
+    moveCurve(default_speed, 1, 999999);
+    moveSimple(default_speed, 0, 200);
+
+    moveCurve(default_speed, 1, 1000);
+
+}
+
+void track2(){
+    moveCurve(default_speed, 1, 999999);
+    moveSimple(default_speed, 0, 50);
+    rotate(-90);
+
+    moveCurve(default_speed, 1, 999999);
+    moveSimple(default_speed, 0, 50);
+    rotate(-100);
+
+    moveCurve(default_speed, 1, 999999);
+
+}
+
+void track3(){
+
+}
+
 void main(void)
 {
 //	WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;		// stop watchdog timer
@@ -203,7 +265,7 @@ void main(void)
     timer_A3_capture_init(); // check rotation
 
     Clock_Delay1ms(500);
-    moveCurve(slow_speed, 1, 999999999);
+    track1();
 
     return;
 
@@ -213,7 +275,8 @@ void rotate(int degree) // 현재 위치를 기준으로 회전, 시계 방향이 + 방향
 {
     if (degree == 0)
         return;
-
+    move(0, 0);
+    Clock_Delay1ms(300);
     if (degree > 0)
     {
         left_forward();
@@ -249,7 +312,7 @@ void rotate(int degree) // 현재 위치를 기준으로 회전, 시계 방향이 + 방향
 void moveSimple(int speed, int checkObstacle, int time) // checkObstacle: 좌우에 장애물이 있으면 엄춤
 {
     int i;
-    for (i = 0; i < time / 50; i++)
+    for (i = 0; i < time / interval; i++)
     {
         if (checkObstacle)
         {
@@ -264,14 +327,14 @@ void moveSimple(int speed, int checkObstacle, int time) // checkObstacle: 좌우에
         right_forward();
         left_forward();
         move(speed, speed);
-        Clock_Delay1ms(50);
+        Clock_Delay1ms(interval);
     }
     move(0, 0);
 }
 void moveCurve(int speed, int checkObstacle, int time) // checkObstacle: 좌우에 장애물이 있으면 엄춤
 {
     int i;
-    for (i = 0; i < time / 50; i++)
+    for (i = 0; i < time / interval; i++)
     {
         printBinary(ir_read());
         if (checkObstacle)
@@ -299,14 +362,14 @@ void moveCurve(int speed, int checkObstacle, int time) // checkObstacle: 좌우에 
         else if (left_sensor2 == 1)
         {
             move(speed * 0.5, speed*1.5);
-            Clock_Delay1ms(50);
+            Clock_Delay1ms(interval);
         }
         else if (right_sensor2 == 1)
         {
             move(speed*1.5, speed * 0.5);
-            Clock_Delay1ms(50);
+            Clock_Delay1ms(interval);
         } else {
-            Clock_Delay1ms(50);
+            Clock_Delay1ms(interval);
         }
     }
     move(0, 0);
