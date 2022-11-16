@@ -16,7 +16,13 @@ uint16_t first_right;
 uint16_t period_left;
 uint16_t period_right;
 uint32_t left_count, right_count;
+uint16_t left_sensor4, left_sensor3, left_sensor2, left_sensor1; // 숫자가 클 수록 바깥쪽
+uint16_t right_sensor1, right_sensor2, right_sensor3, right_sensor4; // 숫자가 클 수록 바깥쪽
 
+int slow_speed = 1000;
+int default_speed = 3000;
+int fast_speed = 6000;
+int rotate_speed = 2000;
 
 void led_init()
 {
@@ -84,42 +90,8 @@ void printBinary(unsigned int num)
     printf("\n");
 }
 
-int ir_read()
+void pwm_init34(uint16_t period, uint16_t duty3, uint16_t duty4)
 {
-
-        // IR on
-        P5->OUT |= 0x08;
-        P9->OUT |= 0x04;
-
-        // charge emitter capacitor
-        P7->DIR = 0xFF;
-        P7->OUT = 0xFF;
-        Clock_Delay1us(10);
-
-        // read sensor
-        P7->DIR = 0x00;
-        Clock_Delay1us(1000);
-        // Read p7, white = 0
-//        sensor = P7->IN & 0x10;
-//
-//        if (sensor)
-//        {
-//            P2->OUT |= 0x01;
-//        }
-//        else
-//        {
-//            P2->OUT &= ~0x07;
-//        }
-
-        // IR off
-        P5->OUT &= ~0x08;
-        P9->OUT &= ~0x04;
-//        Clock_Delay1ms(10);
-        return P7->IN;
-
-}
-
-void pwm_init34(uint16_t period, uint16_t duty3, uint16_t duty4){
     TIMER_A0->CCR[0] = period;
 
     TIMER_A0->EX0 = 0x0000;
@@ -136,7 +108,8 @@ void pwm_init34(uint16_t period, uint16_t duty3, uint16_t duty4){
     P2->SEL1 &= ~0xC0;
 }
 
-void moter_init(void){
+void moter_init(void)
+{
     P3->SEL0 &= ~0xC0; //nSLPR, nSleep
     P3->SEL1 &= ~0xC0;
     P3->DIR |= 0xC0;
@@ -155,35 +128,31 @@ void moter_init(void){
     pwm_init34(7500, 0, 0);
 }
 
-void run_moter(float speed){
-    P5->OUT &= ~0x30; // PH=0
-    P2->OUT |= 0xC0; // EN=1
-    P3->OUT |= 0xC0; // nSleep=1
-    Clock_Delay1us((int) (speed*10000));
-
-    P2->OUT &= ~0xC0;
-    Clock_Delay1us((int) ((1-speed)*10000));
-
-}
-void move(uint16_t leftDuty, uint16_t rightDuty){
+void move(uint16_t leftDuty, uint16_t rightDuty)
+{
+    // set wheel speed
     P3->OUT |= 0xC0;
-    TIMER_A0->CCR[4]=leftDuty;
-    TIMER_A0->CCR[3]=rightDuty;
+    TIMER_A0->CCR[4] = leftDuty;
+    TIMER_A0->CCR[3] = rightDuty;
 }
 
-void left_forward(){
+// set wheel rotation direction
+void left_forward()
+{
     P5->OUT &= ~0x10;
 }
-void left_backward(){
+void left_backward()
+{
     P5->OUT |= 0x10;
 }
-void right_forward(){
+void right_forward()
+{
     P5->OUT &= ~0x20;
 }
-void right_backward(){
+void right_backward()
+{
     P5->OUT |= 0x20;
 }
-
 
 void systick_wait1ms(void)
 {
@@ -202,8 +171,10 @@ void systick_wait1s()
         systick_wait1ms();
     }
 }
+
+int ir_read();
 void (*TimerA2Task)(void);
-void TimerA2_Init(void(*task)(void), uint16_t period);
+void TimerA2_Init(void (*task)(void), uint16_t period);
 void TA2_0_IRQHandler(void);
 void task();
 void timer_A3_capture_init();
@@ -211,6 +182,11 @@ void TA3_0_IRQHandler(void);
 void TA3_N_IRQHandler(void);
 uint32_t get_left_rpm();
 uint32_t get_right_rpm();
+
+// 주행을 위해 추상화된 함수들 직진, 회전 등
+void rotate(int degree); // 현재 위치를 기준으로 회전, 시계 방향이 + 방향
+void moveSimple(int speed, int checkObstacle, int time); // checkObstacle: 좌우에 장애물이 있으면 엄춤
+void moveCurve(int speed, int checkObstacle, int time); // checkObstacle: 좌우에 장애물이 있으면 엄춤
 
 void main(void)
 {
@@ -224,71 +200,137 @@ void main(void)
     ir_init();
     moter_init();
     // TimerA2_Init(&task, 50000);
-    timer_A3_capture_init();
-    int i;
-    int left_senser;
-    int right_senser;
+    timer_A3_capture_init(); // check rotation
 
-    left_backward();
-    right_forward();
-    move(2000,2000);
-    left_count=0;
-    while(1){
+    Clock_Delay1ms(500);
+    moveCurve(slow_speed, 1, 999999999);
 
-        //printf("lc: %d\n", left_count);
-        if(left_count>60){
-
-            move(0,0);
-        }
-    }
-
-    while(1){
-        for(i =0;i<50;i++){
-            systick_wait1ms();
-        }
-
-        int sensor = ir_read();
-        printBinary(sensor);
-        left_senser = sensor >> 7 & 1;
-        right_senser = sensor >> 0 & 1;
-
-        if(left_senser && right_senser){
-            move(0, 0);
-        } else if(left_senser){
-            left_backward();
-            right_forward();
-            move(1000,1000);
-        } else if(right_senser){
-            right_backward();
-            left_forward();
-            move(1000,1000);
-        } else{
-            right_forward();
-            left_forward();
-            move(1000,1000);
-        }
-    }
+    return;
 
 }
 
-void TimerA2_Init(void(*task)(void), uint16_t period){
+void rotate(int degree) // 현재 위치를 기준으로 회전, 시계 방향이 + 방향
+{
+    if (degree == 0)
+        return;
+
+    if (degree > 0)
+    {
+        left_forward();
+        right_backward();
+        left_count = 0;
+        move(rotate_speed, rotate_speed);
+        while (1)
+        {
+            if (left_count >= degree * 2)
+            {
+                move(0, 0);
+                break;
+            }
+        }
+    }
+    if (degree < 0)
+    {
+        left_backward();
+        right_forward();
+        move(rotate_speed, rotate_speed);
+        left_count = 0;
+        while (1)
+        {
+            // printf("%d\n", left_count);
+            if (left_count >= -degree * 2)
+            {
+                move(0, 0);
+                break;
+            }
+        }
+    }
+}
+void moveSimple(int speed, int checkObstacle, int time) // checkObstacle: 좌우에 장애물이 있으면 엄춤
+{
+    int i;
+    for (i = 0; i < time / 50; i++)
+    {
+        if (checkObstacle)
+        {
+            ir_read();
+            if (left_sensor3 == 1 || right_sensor3 == 1)
+                move(0, 0);
+            break;
+        }
+        right_forward();
+        left_forward();
+        move(speed, speed);
+        Clock_Delay1ms(50);
+    }
+    move(0, 0);
+}
+void moveCurve(int speed, int checkObstacle, int time) // checkObstacle: 좌우에 장애물이 있으면 엄춤
+{
+    int i;
+    for (i = 0; i < time / 50; i++)
+    {
+        printBinary(ir_read());
+        if (checkObstacle)
+        {
+            ir_read();
+            printf("%d %d", left_sensor4, right_sensor4);
+            if (left_sensor4 == 1 || right_sensor4 == 1)
+            {
+                move(0, 0);
+                break;
+            }
+
+        }
+        right_forward();
+        left_forward();
+        move(speed, speed);
+        if (left_sensor3 == 1)
+        {
+            rotate(-15);
+        }
+        else if (right_sensor3 == 1)
+        {
+            rotate(15);
+        }
+        else if (left_sensor2 == 1)
+        {
+            move(speed * 0.5, speed*1.5);
+            Clock_Delay1ms(50);
+        }
+        else if (right_sensor2 == 1)
+        {
+            move(speed*1.5, speed * 0.5);
+            Clock_Delay1ms(50);
+        } else {
+            Clock_Delay1ms(50);
+        }
+    }
+    move(0, 0);
+}
+
+void TimerA2_Init(void (*task)(void), uint16_t period)
+{
     TimerA2Task = task;
     TIMER_A2->CTL = 0x0280;
     TIMER_A2->CCTL[0] = 0x0010;
-    TIMER_A2->CCR[0] = (period-1);
+    TIMER_A2->CCR[0] = (period - 1);
     TIMER_A2->EX0 = 0x0005;
-    NVIC->IP[3] = (NVIC->IP[3]&0xFFFFFF00)|0x00000040;
+    NVIC->IP[3] = (NVIC->IP[3] & 0xFFFFFF00) | 0x00000040;
     NVIC->ISER[0] = 0x00001000;
     TIMER_A2->CTL |= 0x0014;
 }
-void TA2_0_IRQHandler(void){
+void TA2_0_IRQHandler(void)
+{
     TIMER_A2->CCTL[0] &= ~0x0001;
     (*TimerA2Task)();
 }
-void task(){
+void task()
+{
     printf("interrupt\n");
 }
-void timer_A3_capture_init(){
+void timer_A3_capture_init()
+{
     P10->SEL0 |= 0x30;
     P10->SEL1 &= ~0x30;
     P10->DIR &= ~0x30;
@@ -300,26 +342,64 @@ void timer_A3_capture_init(){
     TIMER_A3->CCTL[1] = 0x4910;
     TIMER_A3->EX0 &= ~0x0007;
 
-    NVIC->IP[3] = (NVIC->IP[3]&0x0000FFFF)|0x40400000;
+    NVIC->IP[3] = (NVIC->IP[3] & 0x0000FFFF) | 0x40400000;
     NVIC->ISER[0] = 0x0000C000;
     TIMER_A3->CTL |= 0x0024;
 
 }
-void TA3_0_IRQHandler(void){
+void TA3_0_IRQHandler(void)
+{
     TIMER_A3->CCTL[0] &= ~0x0001;
     period_right = TIMER_A3->CCR[0] - first_right;
     first_right = TIMER_A3->CCR[0];
     right_count++;
 }
-void TA3_N_IRQHandler(void){
+void TA3_N_IRQHandler(void)
+{
     TIMER_A3->CCTL[1] &= ~0x0001;
     period_left = TIMER_A3->CCR[1] - first_left;
     first_left = TIMER_A3->CCR[1];
     left_count++;
 }
-uint32_t get_left_rpm(){
-    return 2000000/period_left;
+uint32_t get_left_rpm()
+{
+    return 2000000 / period_left;
 }
-uint32_t get_right_rpm(){
-    return 2000000/period_right;
+uint32_t get_right_rpm()
+{
+    return 2000000 / period_right;
+}
+
+int ir_read()
+{
+
+    // IR on
+    P5->OUT |= 0x08;
+    P9->OUT |= 0x04;
+
+    // charge emitter capacitor
+    P7->DIR = 0xFF;
+    P7->OUT = 0xFF;
+    Clock_Delay1us(10);
+
+    // read sensor
+    P7->DIR = 0x00;
+    Clock_Delay1us(1000);
+    // Read p7, white = 0
+
+    // IR off
+    P5->OUT &= ~0x08;
+    P9->OUT &= ~0x04;
+//        Clock_Delay1ms(10);
+    int sensor = P7->IN;
+    left_sensor4 = sensor >> 7 & 1;
+    left_sensor3 = sensor >> 6 & 1;
+    left_sensor2 = sensor >> 5 & 1;
+    left_sensor1 = sensor >> 4 & 1;
+    right_sensor4 = sensor >> 0 & 1;
+    right_sensor3 = sensor >> 1 & 1;
+    right_sensor2 = sensor >> 2 & 1;
+    right_sensor1 = sensor >> 3 & 1;
+    return P7->IN;
+
 }
