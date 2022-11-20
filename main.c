@@ -190,59 +190,91 @@ void moveSimple(int speed, int checkObstacle, int time); // checkObstacle: ÁÂ¿ì¿
 void moveCurve(int speed, int checkObstacle, int time); // checkObstacle: ÁÂ¿ì¿¡ Àå¾Ö¹°ÀÌ ÀÖÀ¸¸é ¾öÃã
 
 void track1(){
-
+    turn_on_led(LED_BLUE);
     moveCurve(default_speed, 1, 999999);
     Clock_Delay1ms(300);
-    moveSimple(slow_speed, 0, 300);
+    moveSimple(slow_speed, 0, 500);
     rotate(90);
 
     moveCurve(default_speed, 1, 999999);
     Clock_Delay1ms(300);
-    moveSimple(slow_speed, 0, 300);
+    moveSimple(slow_speed, 0, 500);
     rotate(90);
 
     moveCurve(default_speed, 1, 999999);
     Clock_Delay1ms(300);
-    moveSimple(slow_speed, 0, 300);
-    moveSimple(slow_speed, 0, 10);
+    moveSimple(slow_speed, 0, 500);
 
     moveCurve(default_speed, 1, 999999);
     Clock_Delay1ms(300);
-    moveSimple(slow_speed, 0, 300);
+    moveSimple(slow_speed, 0, 500);
     rotate(90);
 
     moveCurve(default_speed, 1, 999999);
     Clock_Delay1ms(300);
-    moveSimple(slow_speed, 0, 300);
+    moveSimple(slow_speed, 0, 500);
     rotate(-90);
 
     moveCurve(default_speed, 1, 999999);
     Clock_Delay1ms(300);
-    moveSimple(slow_speed, 0, 300);
+    moveSimple(slow_speed, 0, 500);
     rotate(90);
 
     moveCurve(default_speed, 1, 999999);
     Clock_Delay1ms(300);
-    moveSimple(slow_speed, 0, 300);
+    moveSimple(slow_speed, 0, 500);
     rotate(-90);
 
     moveCurve(default_speed, 1, 999999);
-    moveSimple(default_speed, 0, 200);
+    moveSimple(slow_speed, 0, 600);
 
-    moveCurve(default_speed, 1, 1000);
+    moveCurve(slow_speed, 0, 500);
 
 }
 
 void track2(){
+    turn_on_led(LED_GREEN);
     moveCurve(default_speed, 1, 999999);
-    moveSimple(default_speed, 0, 50);
+    Clock_Delay1ms(300);
+    moveSimple(slow_speed, 0, 500);
     rotate(-90);
 
     moveCurve(default_speed, 1, 999999);
-    moveSimple(default_speed, 0, 50);
-    rotate(-100);
+    Clock_Delay1ms(300);
+    moveSimple(slow_speed, 0, 500);
+    rotate(-90);
 
     moveCurve(default_speed, 1, 999999);
+    moveSimple(slow_speed, 0, 500);
+    moveCurve(default_speed, 1, 999999);
+    Clock_Delay1ms(300);
+    moveSimple(slow_speed, 0, 500);
+    rotate(90);
+    moveCurve(slow_speed, 1, 999999);
+    moveSimple(slow_speed, 0, 500);
+
+    moveCurve(default_speed, 1, 999999);
+    moveSimple(slow_speed, 0, 600);
+    moveCurve(default_speed, 1, 999999);
+    moveSimple(slow_speed, 0, 500);
+
+    moveCurve(default_speed, 1, 999999);
+    Clock_Delay1ms(300);
+    moveSimple(slow_speed, 0, 500);
+    rotate(30);
+    moveSimple(slow_speed, 0, 500);
+
+    moveCurve(default_speed, 1, 999999);
+    moveSimple(slow_speed, 0, 600);
+
+    moveCurve(default_speed, 1, 999999);
+    Clock_Delay1ms(300);
+    moveSimple(slow_speed, 0, 500);
+    rotate(90);
+
+
+
+
 
 }
 
@@ -266,7 +298,7 @@ void main(void)
 
     Clock_Delay1ms(500);
     track1();
-
+    track2();
     return;
 
 }
