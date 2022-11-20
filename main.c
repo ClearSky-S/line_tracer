@@ -253,12 +253,7 @@ void track2(){
     moveCurve(default_speed, 1, 999999);
     moveSimple(slow_speed, 0, 500);
 
-    moveCurve(default_speed, 1, 999999);
-    moveSimple(slow_speed, 0, 300);
-    rotate(-90);
-    moveCurve(default_speed, 1, 999999);
-    moveSimple(slow_speed, 0, 300);
-    rotate(-70);
+    moveCurve2(slow_speed, 1, 999999);
 
     moveSimple(slow_speed, 0, 300);
 
@@ -284,9 +279,9 @@ void main(void)
     timer_A3_capture_init(); // check rotation
 
     Clock_Delay1ms(700);
-    track1();
-    track2();
-
+//    track1();
+//    track2();
+    moveCurve2(slow_speed, 1, 999999);
     return;
 
 }
@@ -415,40 +410,33 @@ void moveCurve2(int speed, int checkObstacle, int time) // checkObstacle: �¿쿡
         }
         right_forward();
         left_forward();
-        move(speed*0.5, speed*0.5);
+        move(speed, speed);
         if(0){
 
         }
         else if (left_sensor3 && !right_sensor3)
         {
-            move(0,0);
-            Clock_Delay1ms(200);
-            rotate(-45);
             right_forward();
-            left_forward();
-            move(speed*0.5, speed*0.5);
-            Clock_Delay1ms(200);
+            left_backward();
+            move(speed, speed);
             Clock_Delay1ms(interval);
         }
         else if ( !left_sensor3 && right_sensor3)
         {
-            move(0,0);
-            Clock_Delay1ms(200);
-            rotate(45);
-            right_forward();
+
+            right_backward();
             left_forward();
-            move(speed*0.5, speed*0.5);
-            Clock_Delay1ms(200);
+            move(speed, speed);
             Clock_Delay1ms(interval);
         }
         else if (left_sensor2 && !right_sensor2)
         {
-            move(speed * 0.2, speed);
+            move(speed * 0.2, speed*1.5);
             Clock_Delay1ms(interval);
         }
         else if ( !left_sensor2 && right_sensor2)
         {
-            move(speed, speed * 0.2);
+            move(speed*1.5, speed * 0.2);
             Clock_Delay1ms(interval);
         }
         else {
