@@ -193,89 +193,93 @@ void track1(){
     turn_on_led(LED_BLUE);
     moveCurve(default_speed, 1, 999999);
     Clock_Delay1ms(300);
-    moveSimple(slow_speed, 0, 500);
+    moveSimple(slow_speed, 0, 300);
     rotate(90);
 
     moveCurve(default_speed, 1, 999999);
     Clock_Delay1ms(300);
-    moveSimple(slow_speed, 0, 500);
+    moveSimple(slow_speed, 0, 300);
     rotate(90);
 
     moveCurve(default_speed, 1, 999999);
     Clock_Delay1ms(300);
-    moveSimple(slow_speed, 0, 500);
+    moveSimple(slow_speed, 0, 300);
 
     moveCurve(default_speed, 1, 999999);
     Clock_Delay1ms(300);
-    moveSimple(slow_speed, 0, 500);
+    moveSimple(slow_speed, 0, 300);
     rotate(90);
 
     moveCurve(default_speed, 1, 999999);
     Clock_Delay1ms(300);
-    moveSimple(slow_speed, 0, 500);
+    moveSimple(slow_speed, 0, 300);
     rotate(-90);
 
     moveCurve(default_speed, 1, 999999);
     Clock_Delay1ms(300);
-    moveSimple(slow_speed, 0, 500);
+    moveSimple(slow_speed, 0, 300);
     rotate(90);
 
     moveCurve(default_speed, 1, 999999);
     Clock_Delay1ms(300);
-    moveSimple(slow_speed, 0, 500);
+    moveSimple(slow_speed, 0, 300);
     rotate(-90);
 
     moveCurve(default_speed, 1, 999999);
-    moveSimple(slow_speed, 0, 600);
+    moveSimple(slow_speed, 0, 300);
 
-    moveCurve(slow_speed, 0, 500);
+    moveCurve(default_speed, 1, 999999);
+    Clock_Delay1ms(300);
+    moveSimple(slow_speed, 0, 300);
+    rotate(-90);
 
 }
 
 void track2(){
     turn_on_led(LED_GREEN);
+
+    // hair pin curve 1
     moveCurve(default_speed, 1, 999999);
     Clock_Delay1ms(300);
-    moveSimple(slow_speed, 0, 500);
+    moveSimple(slow_speed, 0, 300);
     rotate(-90);
 
     moveCurve(default_speed, 1, 999999);
     Clock_Delay1ms(300);
-    moveSimple(slow_speed, 0, 500);
-    rotate(-90);
-
-    moveCurve(default_speed, 1, 999999);
-    moveSimple(slow_speed, 0, 500);
-    moveCurve(default_speed, 1, 999999);
-    Clock_Delay1ms(300);
-    moveSimple(slow_speed, 0, 500);
-    rotate(90);
-    moveCurve(slow_speed, 1, 999999);
-    moveSimple(slow_speed, 0, 500);
-
-    moveCurve(default_speed, 1, 999999);
-    moveSimple(slow_speed, 0, 600);
-    moveCurve(default_speed, 1, 999999);
-    moveSimple(slow_speed, 0, 500);
+    moveSimple(slow_speed, 0, 300);
 
     moveCurve(default_speed, 1, 999999);
     Clock_Delay1ms(300);
-    moveSimple(slow_speed, 0, 500);
-    rotate(30);
-    moveSimple(slow_speed, 0, 500);
-
+    moveSimple(slow_speed, 0, 300);
+    rotate(70);
     moveCurve(default_speed, 1, 999999);
-    moveSimple(slow_speed, 0, 600);
 
+    Clock_Delay1ms(300);
+    moveSimple(slow_speed, 0, 300);
+    rotate(70);
+    moveCurve(default_speed, 1, 999999);
+    Clock_Delay1ms(300);
+    moveSimple(slow_speed, 0, 300);
+
+    // hair pin curve2
     moveCurve(default_speed, 1, 999999);
     Clock_Delay1ms(300);
     moveSimple(slow_speed, 0, 500);
-    rotate(90);
 
+    moveCurve(default_speed, 1, 999999);
+    Clock_Delay1ms(300);
+    moveSimple(slow_speed, 0, 300);
 
+    // hair pin curve3
+    moveCurve(default_speed, 1, 999999);
+    Clock_Delay1ms(300);
+    moveSimple(slow_speed, 0, 300);
 
+    moveCurve(default_speed, 1, 999999);
+    Clock_Delay1ms(300);
+    moveSimple(slow_speed, 0, 300);
 
-
+    moveCurve(default_speed, 1, 999999);
 }
 
 void track3(){
@@ -283,6 +287,7 @@ void track3(){
 }
 
 void main(void)
+
 {
 //	WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;		// stop watchdog timer
 
@@ -296,8 +301,8 @@ void main(void)
     // TimerA2_Init(&task, 50000);
     timer_A3_capture_init(); // check rotation
 
-    Clock_Delay1ms(500);
-    track1();
+    Clock_Delay1ms(700);
+//    track1();
     track2();
     return;
 
@@ -308,7 +313,6 @@ void rotate(int degree) // 현재 위치를 기준으로 회전, 시계 방향이 + 방향
     if (degree == 0)
         return;
     move(0, 0);
-    Clock_Delay1ms(300);
     if (degree > 0)
     {
         left_forward();
@@ -373,7 +377,9 @@ void moveCurve(int speed, int checkObstacle, int time) // checkObstacle: 좌우에 
         {
             ir_read();
             printf("%d %d", left_sensor4, right_sensor4);
-            if (left_sensor4 == 1 || right_sensor4 == 1)
+            if ( (left_sensor4 )
+                    || (right_sensor4)
+                    || (left_sensor3 && right_sensor3))
             {
                 move(0, 0);
                 break;
@@ -383,20 +389,15 @@ void moveCurve(int speed, int checkObstacle, int time) // checkObstacle: 좌우에 
         right_forward();
         left_forward();
         move(speed, speed);
-        if (left_sensor3 == 1)
-        {
-            rotate(-15);
+        if(0){
+
         }
-        else if (right_sensor3 == 1)
-        {
-            rotate(15);
-        }
-        else if (left_sensor2 == 1)
+        else if (left_sensor2 && !right_sensor2)
         {
             move(speed * 0.5, speed*1.5);
             Clock_Delay1ms(interval);
         }
-        else if (right_sensor2 == 1)
+        else if ( !left_sensor2 && right_sensor2)
         {
             move(speed*1.5, speed * 0.5);
             Clock_Delay1ms(interval);
