@@ -188,40 +188,34 @@ uint32_t get_right_rpm();
 void rotate(int degree); // 현재 위치를 기준으로 회전, 시계 방향이 + 방향
 void moveSimple(int speed, int checkObstacle, int time); // checkObstacle: 좌우에 장애물이 있으면 엄춤
 void moveCurve(int speed, int checkObstacle, int time); // checkObstacle: 좌우에 장애물이 있으면 엄춤
+void moveCurve2(int speed, int checkObstacle, int time); // 곡면이 강한 커브길
 
 void track1(){
     turn_on_led(LED_BLUE);
     moveCurve(default_speed, 1, 999999);
-    Clock_Delay1ms(300);
     moveSimple(slow_speed, 0, 300);
     rotate(90);
 
     moveCurve(default_speed, 1, 999999);
-    Clock_Delay1ms(300);
     moveSimple(slow_speed, 0, 300);
     rotate(90);
 
     moveCurve(default_speed, 1, 999999);
-    Clock_Delay1ms(300);
     moveSimple(slow_speed, 0, 300);
 
     moveCurve(default_speed, 1, 999999);
-    Clock_Delay1ms(300);
     moveSimple(slow_speed, 0, 300);
     rotate(90);
 
     moveCurve(default_speed, 1, 999999);
-    Clock_Delay1ms(300);
     moveSimple(slow_speed, 0, 300);
     rotate(-90);
 
     moveCurve(default_speed, 1, 999999);
-    Clock_Delay1ms(300);
     moveSimple(slow_speed, 0, 300);
     rotate(90);
 
     moveCurve(default_speed, 1, 999999);
-    Clock_Delay1ms(300);
     moveSimple(slow_speed, 0, 300);
     rotate(-90);
 
@@ -229,7 +223,6 @@ void track1(){
     moveSimple(slow_speed, 0, 300);
 
     moveCurve(default_speed, 1, 999999);
-    Clock_Delay1ms(300);
     moveSimple(slow_speed, 0, 300);
     rotate(-90);
 
@@ -240,46 +233,35 @@ void track2(){
 
     // hair pin curve 1
     moveCurve(default_speed, 1, 999999);
-    Clock_Delay1ms(300);
-    moveSimple(slow_speed, 0, 300);
+    moveSimple(slow_speed, 0, 400);
     rotate(-90);
 
     moveCurve(default_speed, 1, 999999);
-    Clock_Delay1ms(300);
-    moveSimple(slow_speed, 0, 300);
+    moveSimple(slow_speed, 0, 500);
 
     moveCurve(default_speed, 1, 999999);
-    Clock_Delay1ms(300);
-    moveSimple(slow_speed, 0, 300);
+    moveSimple(slow_speed, 0, 200);
     rotate(70);
     moveCurve(default_speed, 1, 999999);
 
-    Clock_Delay1ms(300);
-    moveSimple(slow_speed, 0, 300);
+    moveSimple(slow_speed, 0, 200);
     rotate(70);
     moveCurve(default_speed, 1, 999999);
-    Clock_Delay1ms(300);
     moveSimple(slow_speed, 0, 300);
 
     // hair pin curve2
     moveCurve(default_speed, 1, 999999);
-    Clock_Delay1ms(300);
     moveSimple(slow_speed, 0, 500);
 
     moveCurve(default_speed, 1, 999999);
-    Clock_Delay1ms(300);
+    moveSimple(slow_speed, 0, 300);
+    rotate(-90);
+    moveCurve(default_speed, 1, 999999);
+    moveSimple(slow_speed, 0, 300);
+    rotate(-70);
+
     moveSimple(slow_speed, 0, 300);
 
-    // hair pin curve3
-    moveCurve(default_speed, 1, 999999);
-    Clock_Delay1ms(300);
-    moveSimple(slow_speed, 0, 300);
-
-    moveCurve(default_speed, 1, 999999);
-    Clock_Delay1ms(300);
-    moveSimple(slow_speed, 0, 300);
-
-    moveCurve(default_speed, 1, 999999);
 }
 
 void track3(){
@@ -302,8 +284,9 @@ void main(void)
     timer_A3_capture_init(); // check rotation
 
     Clock_Delay1ms(700);
-//    track1();
+    track1();
     track2();
+
     return;
 
 }
@@ -377,11 +360,12 @@ void moveCurve(int speed, int checkObstacle, int time) // checkObstacle: 좌우에 
         {
             ir_read();
             printf("%d %d", left_sensor4, right_sensor4);
-            if ( (left_sensor4 )
+            if ( (left_sensor4)
                     || (right_sensor4)
-                    || (left_sensor3 && right_sensor3))
+                    || (left_sensor3 && left_sensor4))
             {
                 move(0, 0);
+                Clock_Delay1ms(300);
                 break;
             }
 
@@ -400,8 +384,74 @@ void moveCurve(int speed, int checkObstacle, int time) // checkObstacle: 좌우에 
         else if ( !left_sensor2 && right_sensor2)
         {
             move(speed*1.5, speed * 0.5);
+
             Clock_Delay1ms(interval);
         } else {
+            Clock_Delay1ms(interval);
+        }
+    }
+    move(0, 0);
+}
+
+void moveCurve2(int speed, int checkObstacle, int time) // checkObstacle: 좌우에 장애물이 있으면 엄춤
+{
+    int i;
+    for (i = 0; i < time / interval; i++)
+    {
+        printBinary(ir_read());
+        if (checkObstacle)
+        {
+            ir_read();
+            printf("%d %d", left_sensor4, right_sensor4);
+            if ( (left_sensor4)
+                    || (right_sensor4)
+                    || (left_sensor3 && left_sensor4))
+            {
+                move(0, 0);
+                Clock_Delay1ms(300);
+                break;
+            }
+
+        }
+        right_forward();
+        left_forward();
+        move(speed*0.5, speed*0.5);
+        if(0){
+
+        }
+        else if (left_sensor3 && !right_sensor3)
+        {
+            move(0,0);
+            Clock_Delay1ms(200);
+            rotate(-45);
+            right_forward();
+            left_forward();
+            move(speed*0.5, speed*0.5);
+            Clock_Delay1ms(200);
+            Clock_Delay1ms(interval);
+        }
+        else if ( !left_sensor3 && right_sensor3)
+        {
+            move(0,0);
+            Clock_Delay1ms(200);
+            rotate(45);
+            right_forward();
+            left_forward();
+            move(speed*0.5, speed*0.5);
+            Clock_Delay1ms(200);
+            Clock_Delay1ms(interval);
+        }
+        else if (left_sensor2 && !right_sensor2)
+        {
+            move(speed * 0.2, speed);
+            Clock_Delay1ms(interval);
+        }
+        else if ( !left_sensor2 && right_sensor2)
+        {
+            move(speed, speed * 0.2);
+            Clock_Delay1ms(interval);
+        }
+        else {
             Clock_Delay1ms(interval);
         }
     }
