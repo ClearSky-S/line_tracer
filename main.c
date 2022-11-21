@@ -251,18 +251,165 @@ void track2(){
 
     // hair pin curve2
     moveCurve(default_speed, 1, 999999);
+    rotate(-20);
     moveSimple(slow_speed, 0, 500);
 
-    moveCurve2(slow_speed, 1, 999999);
+    moveCurve2(slow_speed*1.5, 1, 999999);
+    rotate(-15);
+    moveSimple(slow_speed, 0, 800);
 
-    moveSimple(slow_speed, 0, 300);
+    // hair pin curve3
+    moveCurve2(slow_speed*1.5, 1, 999999);
+    moveSimple(slow_speed, 0, 500);
+    rotate(30);
+
+    moveCurve(default_speed, 1, 999999);
+    moveSimple(slow_speed, 0, 200);
+    rotate(-90);
+    moveCurve(slow_speed*1.5, 1, 999999);
+
+    moveSimple(slow_speed, 0, 200);
+    rotate(-50);
+    moveCurve(default_speed, 1, 999999);
+    moveSimple(slow_speed, 0, 500);
+
+
+    moveCurve2(slow_speed*1.5, 1, 999999);
+    moveSimple(slow_speed, 0, 200);
+    rotate(70);
+
+    moveCurve(default_speed, 1, 999999);
+    moveSimple(slow_speed, 0, 200);
+    rotate(70);
+    moveCurve2(slow_speed*1.5, 1, 1000);
+
+
 
 }
 
 void track3(){
+    turn_on_led(LED_BLUE);
+
+    moveCurve(default_speed, 1, 999999);
+    moveSimple(slow_speed, 0, 300);
+    rotate(90);
+
+    moveCurve2(slow_speed*1.5, 1, 999999);
+
+    moveSimple(slow_speed, 0, 300);
+    rotate(-90);
+    moveCurve2(slow_speed*1.5, 1, 999999);
+    moveSimple(slow_speed, 0, 300);
+    rotate(90);
+    moveCurve2(slow_speed*1.5, 1, 999999);
+
+    moveSimple(slow_speed, 0, 300);
+    rotate(-90);
+    moveCurve2(slow_speed*1.5, 1, 999999);
+    moveSimple(slow_speed, 0, 300);
+    rotate(90);
+    moveCurve2(slow_speed*1.5, 1, 999999);
+
+    moveSimple(slow_speed, 0, 300);
+    rotate(-90);
+    moveCurve2(slow_speed*1.5, 1, 999999);
+    moveSimple(slow_speed, 0, 300);
+    rotate(90);
+    moveCurve2(slow_speed*1.5, 1, 999999);
+
+    moveSimple(slow_speed, 0, 300);
+    rotate(-90);
+    moveCurve2(slow_speed*1.5, 1, 999999);
+
+    moveSimple(slow_speed, 0, 300);
+    rotate(-90);
+
 
 }
 
+void track4(){
+    turn_on_led(LED_GREEN);
+
+    moveCurve(default_speed, 1, 999999);
+    moveSimple(slow_speed, 0, 300);
+    rotate(90);
+
+    moveCurve(default_speed, 1, 999999);
+
+    rotate(90);
+    moveSimple(slow_speed, 0, 800);
+    rotate(75);
+
+    moveCurve2(slow_speed*1.5, 1, 999999);
+    rotate(-15);
+    moveSimple(slow_speed, 0, 300);
+    rotate(-90);
+
+    moveCurve(default_speed, 1, 999999);
+    moveSimple(slow_speed, 0, 300);
+    rotate(90);
+
+    moveCurve2(slow_speed*1.5, 1, 999999);
+    moveSimple(slow_speed, 0, 300);
+    rotate(90);
+}
+void track5(){
+    turn_on_led(LED_BLUE);
+
+    moveCurve(default_speed, 1, 999999);
+    moveSimple(slow_speed, 0, 300);
+    rotate(-90);
+
+    moveCurve(default_speed, 1, 999999);
+    moveSimple(slow_speed, 0, 500);
+    moveCurve(default_speed, 1, 999999);
+    moveSimple(slow_speed, 0, 300);
+    rotate(-90);
+
+    moveCurve(default_speed, 1, 999999);
+    moveSimple(slow_speed, 0, 300);
+    rotate(-90);
+
+    moveCurve(default_speed, 1, 999999);
+    moveSimple(slow_speed, 0, 500);
+    moveCurve(default_speed, 1, 999999);
+    moveSimple(slow_speed, 0, 300);
+    rotate(90);
+}
+
+void track6(){
+    turn_on_led(LED_GREEN);
+
+    moveCurve(default_speed, 1, 999999);
+    rotate(90);
+    moveSimple(slow_speed, 0, 1200);
+    rotate(30);
+    moveCurve2(default_speed*0.7, 1, 999999);
+
+    rotate(-30);
+    moveSimple(slow_speed, 0, 600);
+    rotate(-90);
+
+    moveCurve2(default_speed*0.7, 1, 999999);
+    moveSimple(slow_speed, 0, 300);
+    rotate(90);
+
+    moveCurve2(default_speed*0.7, 1, 999999);
+    moveSimple(slow_speed, 0, 300);
+    rotate(90);
+
+    moveCurve2(default_speed*0.7, 1, 999999);
+    moveSimple(slow_speed, 0, 300);
+    rotate(-90);
+
+    moveCurve(default_speed, 1, 999999);
+    moveSimple(slow_speed, 0, 300);
+    rotate(90);
+
+    moveCurve(default_speed, 1, 999999);
+    moveSimple(slow_speed, 0, 600);
+    moveCurve2(slow_speed, 0, 600);
+}
 void main(void)
 
 {
@@ -279,9 +426,21 @@ void main(void)
     timer_A3_capture_init(); // check rotation
 
     Clock_Delay1ms(700);
-//    track1();
-//    track2();
-    moveCurve2(slow_speed, 1, 999999);
+    track1();
+    track2();
+    track3();
+    track4();
+    track5();
+    track6();
+
+    track1();
+    track2();
+    track3();
+    track4();
+    track5();
+    track6();
+//    moveCurve2(slow_speed*1.5, 1, 999999);
+
     return;
 
 }
@@ -357,7 +516,7 @@ void moveCurve(int speed, int checkObstacle, int time) // checkObstacle: �¿쿡 
             printf("%d %d", left_sensor4, right_sensor4);
             if ( (left_sensor4)
                     || (right_sensor4)
-                    || (left_sensor3 && left_sensor4))
+                    || (left_sensor3 && right_sensor3))
             {
                 move(0, 0);
                 Clock_Delay1ms(300);
@@ -400,7 +559,7 @@ void moveCurve2(int speed, int checkObstacle, int time) // checkObstacle: �¿쿡
             printf("%d %d", left_sensor4, right_sensor4);
             if ( (left_sensor4)
                     || (right_sensor4)
-                    || (left_sensor3 && left_sensor4))
+                    || (left_sensor3 && right_sensor3))
             {
                 move(0, 0);
                 Clock_Delay1ms(300);
