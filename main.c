@@ -19,10 +19,10 @@ uint32_t left_count, right_count;
 uint16_t left_sensor4, left_sensor3, left_sensor2, left_sensor1; // 숫자가 클 수록 바깥쪽
 uint16_t right_sensor1, right_sensor2, right_sensor3, right_sensor4; // 숫자가 클 수록 바깥쪽
 
-int slow_speed = 1000;
+int slow_speed = 1000; // 바꾸지 말 것, 정확한 거리를 이동할 필요가 있는 작업에 사용됨
 int default_speed = 3000;
-int fast_speed = 6000;
-int rotate_speed = 1500;
+
+int rotate_speed = 1500; // 최적화 필요
 int interval=10;
 
 void led_init()
@@ -193,7 +193,7 @@ void moveCurve2(int speed, int checkObstacle, int time); // 곡면이 강한 커브길
 void track1(){
     turn_on_led(LED_BLUE);
     moveCurve(default_speed, 1, 999999);
-    moveSimple(slow_speed, 0, 300);
+    moveSimple(slow_speed, 0, 300); // 센서가 바퀴의 중심축보다 조금 앞에 있어서 조금 앞으로 간 다음에 회전해야함
     rotate(90);
 
     moveCurve(default_speed, 1, 999999);
@@ -240,7 +240,7 @@ void track2(){
     moveSimple(slow_speed, 0, 500);
 
     moveCurve(default_speed, 1, 999999);
-    moveSimple(slow_speed, 0, 200);
+    moveSimple(slow_speed, 0, 200); // 지나치게 많이 꺽이는 커브는 ㄷ자 도로처럼 다뤄줘야함
     rotate(70);
     moveCurve(default_speed, 1, 999999);
 
@@ -255,6 +255,7 @@ void track2(){
     moveSimple(slow_speed, 0, 500);
 
     moveCurve2(slow_speed*1.5, 1, 999999);
+    // moveCurve2는 많이 꺽이는 커브를 이동하기 위한 함수인데 너무 빠르게 달리면 이탈할 수 있으니 속도 값을 한계까지 잘 최적화해야함
     rotate(-15);
     moveSimple(slow_speed, 0, 800);
 
@@ -519,7 +520,7 @@ void moveCurve(int speed, int checkObstacle, int time) // checkObstacle: 좌우에 
                     || (left_sensor3 && right_sensor3))
             {
                 move(0, 0);
-                Clock_Delay1ms(300);
+                Clock_Delay1ms(300); // 관성 때분에 장애물 만나면 잠깐 정지하게 했는데 더 짧게 정지해도 될듯
                 break;
             }
 
@@ -562,7 +563,7 @@ void moveCurve2(int speed, int checkObstacle, int time) // checkObstacle: 좌우에
                     || (left_sensor3 && right_sensor3))
             {
                 move(0, 0);
-                Clock_Delay1ms(300);
+                Clock_Delay1ms(300); // 관성 때분에 장애물 만나면 잠깐 정지하게 했는데 더 짧게 정지해도 될듯
                 break;
             }
 
